@@ -110,10 +110,10 @@ class MwsOrderClientPack extends MwsOrderClient implements ThrottleAwareClientPa
     public function callListOrdersWithStatus(\DateTime $dateFrom, \DateTime $dateTo, $orderStatus = null)
     {
         $requestArray = [
-            self::PARAM_CREATED_AFTER => $dateFrom,
-            self::PARAM_CREATED_BEFORE => $dateTo,
-            self::PARAM_MARKETPLACE_ID => $this->marketplaceId,
-            self::PARAM_MERCHANT => $this->sellerId,
+            self::PARAM_MERCHANT            => $this->sellerId,
+            self::PARAM_MARKETPLACE_ID      => $this->marketplaceId,
+            self::PARAM_CREATED_AFTER       => $dateFrom->format('c'),
+            self::PARAM_CREATED_BEFORE      => $dateTo->format('c'),
         ];
         
         if ($orderStatus) {
