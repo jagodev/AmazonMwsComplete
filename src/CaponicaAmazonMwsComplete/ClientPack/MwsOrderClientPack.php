@@ -15,10 +15,28 @@ class MwsOrderClientPack extends MwsOrderClient implements ThrottleAwareClientPa
     const PARAM_MARKETPLACE_ID_LIST         = 'MarketplaceId.Id.1';
     const PARAM_MERCHANT                    = 'SellerId';
     const PARAM_NEXT_TOKEN                  = 'NextToken';
+    const PARAM_LAST_UPDATED_AFTER          = 'LastUpdatedAfter';
+    const PARAM_LAST_UPDATED_BEFORE         = 'LastUpdatedBefore';
+    const PARAM_ORDER_STATUS                = 'OrderStatus';
+    const PARAM_FULFILLMENT_CHANNEL         = 'FulfillmentChannel';
+    const PARAM_PAYMENT_METHOD              = 'PaymentMethod';
+    const PARAM_BUYER_EMAIL                 = 'BuyerEmail';
+    const PARAM_SELLER_ORDER_ID             = 'SellerOrderId';
+    const PARAM_MAX_RESULTS_PER_PAGE        = 'MaxResultsPerPage';
+    const PARAM_TFM_SHIPMENT_STATUS         = 'TFMShipmentStatus';
 
     const METHOD_GET_ORDER                  = 'getOrder';
     const METHOD_LIST_ORDERS                = 'listOrders';
     const METHOD_LIST_ORDERS_BY_NEXT_TOKEN  = 'listOrdersByNextToken';
+    
+    const PARAM_ORDER_STATUS_PENDING_AVAILABILITY   = 'PendingAvailability';
+    const PARAM_ORDER_STATUS_PENDING                = 'Pending';
+    const PARAM_ORDER_STATUS_UNSHIPPED              = 'Unshipped';
+    const PARAM_ORDER_STATUS_PARTIALLY_SHIPPED      = 'PartiallyShipped';
+    const PARAM_ORDER_STATUS_SHIPPED                = 'Shipped';
+    const PARAM_ORDER_STATUS_INVOICE_UNCONFIRMED    = 'InvoiceUnconfirmed';
+    const PARAM_ORDER_STATUS_CANCELED               = 'Canceled';
+    const PARAM_ORDER_STATUS_UNFULFILLABLE          = 'Unfulfillable';
 
     /** @var string $marketplaceId      The MWS MarketplaceID string used in API connections */
     protected $marketplaceId;
@@ -78,6 +96,31 @@ class MwsOrderClientPack extends MwsOrderClient implements ThrottleAwareClientPa
         ];
 
         return CaponicaClientPack::throttledCall($this, self::METHOD_LIST_ORDERS_BY_NEXT_TOKEN, $requestArray);
+    }
+
+    /**
+     * Get orders within specified time frame with optional order-statuses
+     * 
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param array|null $orderStatus
+     * 
+     * @return \MarketplaceWebServiceOrders_Model_ListOrdersResponse
+     */
+    public function callListOrdersWithStatus(\DateTime $dateFrom, \DateTime $dateTo, $orderStatus = null)
+    {
+        $requestArray = [
+            self::PARAM_CREATED_AFTER => $dateFrom,
+            self::PARAM_CREATED_BEFORE => $dateTo,
+            self::PARAM_MARKETPLACE_ID => $this->marketplaceId,
+            self::PARAM_MERCHANT => $this->sellerId,
+        ];
+        
+        if ($orderStatus) {
+            $requestArray[self::PARAM_ORDER_STATUS] = $orderStatus;
+        }
+
+        return CaponicaClientPack::throttledCall($this, self::METHOD_LIST_ORDERS, $requestArray);
     }
 
     // ###################################################
