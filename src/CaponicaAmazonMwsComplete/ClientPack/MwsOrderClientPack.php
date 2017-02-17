@@ -28,6 +28,7 @@ class MwsOrderClientPack extends MwsOrderClient implements ThrottleAwareClientPa
     const METHOD_GET_ORDER                  = 'getOrder';
     const METHOD_LIST_ORDERS                = 'listOrders';
     const METHOD_LIST_ORDERS_BY_NEXT_TOKEN  = 'listOrdersByNextToken';
+    const METHOD_LIST_ORDER_ITEMS           = 'listOrderItems';
     
     const PARAM_ORDER_STATUS_PENDING_AVAILABILITY   = 'PendingAvailability';
     const PARAM_ORDER_STATUS_PENDING                = 'Pending';
@@ -123,6 +124,22 @@ class MwsOrderClientPack extends MwsOrderClient implements ThrottleAwareClientPa
         return CaponicaClientPack::throttledCall($this, self::METHOD_LIST_ORDERS, $requestArray);
     }
 
+    /**
+     * Get order items by AmazorOrderId
+     * 
+     * @param string $orderId
+     * @return \MarketplaceWebServiceOrders_Model_ListOrderItemsResponse
+     */
+    public function callListOrderItems(string $orderId)
+    {
+        $requestArray = [
+            self::PARAM_MERCHANT            => $this->sellerId,
+            self::PARAM_AMAZON_ORDER_IDS    => $orderId,
+        ];
+
+        return CaponicaClientPack::throttledCall($this, self::METHOD_LIST_ORDER_ITEMS, $requestArray);
+    }
+
     // ###################################################
     // # ThrottleAwareClientPackInterface implementation #
     // ###################################################
@@ -134,6 +151,7 @@ class MwsOrderClientPack extends MwsOrderClient implements ThrottleAwareClientPa
                 self::METHOD_GET_ORDER                  => [6, 0.015],
                 self::METHOD_LIST_ORDERS                => [6, 0.015],
                 self::METHOD_LIST_ORDERS_BY_NEXT_TOKEN  => [null, null, null, self::METHOD_LIST_ORDERS],
+                self::METHOD_LIST_ORDER_ITEMS           => [30, 0.5]
             ]
         );
     }
