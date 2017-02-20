@@ -25,10 +25,11 @@ class MwsOrderClientPack extends MwsOrderClient implements ThrottleAwareClientPa
     const PARAM_MAX_RESULTS_PER_PAGE        = 'MaxResultsPerPage';
     const PARAM_TFM_SHIPMENT_STATUS         = 'TFMShipmentStatus';
 
-    const METHOD_GET_ORDER                  = 'getOrder';
-    const METHOD_LIST_ORDERS                = 'listOrders';
-    const METHOD_LIST_ORDERS_BY_NEXT_TOKEN  = 'listOrdersByNextToken';
-    const METHOD_LIST_ORDER_ITEMS           = 'listOrderItems';
+    const METHOD_GET_ORDER                      = 'getOrder';
+    const METHOD_LIST_ORDERS                    = 'listOrders';
+    const METHOD_LIST_ORDERS_BY_NEXT_TOKEN      = 'listOrdersByNextToken';
+    const METHOD_LIST_ORDER_ITEMS               = 'listOrderItems';
+    const METHOD_LIST_ORDER_ITEMS_BY_NEXT_TOKEN = 'listOrderItemsByNextToken';
     
     const PARAM_ORDER_STATUS_PENDING_AVAILABILITY   = 'PendingAvailability';
     const PARAM_ORDER_STATUS_PENDING                = 'Pending';
@@ -140,6 +141,22 @@ class MwsOrderClientPack extends MwsOrderClient implements ThrottleAwareClientPa
         return CaponicaClientPack::throttledCall($this, self::METHOD_LIST_ORDER_ITEMS, $requestArray);
     }
 
+    /**
+     * Get next page of order items using NextToken
+     * 
+     * @param string $nextToken
+     * @return \MarketplaceWebServiceOrders_Model_ListOrderItemsByNextTokenResponse
+     */
+    public function callListOrderItemsByNextToken(string $nextToken)
+    {
+        $requestArray = [
+            self::PARAM_MERCHANT            => $this->sellerId,
+            self::PARAM_NEXT_TOKEN          => $nextToken,
+        ];
+
+        return CaponicaClientPack::throttledCall($this, self::METHOD_LIST_ORDER_ITEMS_BY_NEXT_TOKEN, $requestArray);
+    }
+
     // ###################################################
     // # ThrottleAwareClientPackInterface implementation #
     // ###################################################
@@ -148,10 +165,11 @@ class MwsOrderClientPack extends MwsOrderClient implements ThrottleAwareClientPa
     public function initThrottleManager() {
         $this->throttleManager = new ThrottledRequestManager(
             [
-                self::METHOD_GET_ORDER                  => [6, 0.015],
-                self::METHOD_LIST_ORDERS                => [6, 0.015],
-                self::METHOD_LIST_ORDERS_BY_NEXT_TOKEN  => [null, null, null, self::METHOD_LIST_ORDERS],
-                self::METHOD_LIST_ORDER_ITEMS           => [30, 0.5]
+                self::METHOD_GET_ORDER                      => [6, 0.015],
+                self::METHOD_LIST_ORDERS                    => [6, 0.015],
+                self::METHOD_LIST_ORDERS_BY_NEXT_TOKEN      => [null, null, null, self::METHOD_LIST_ORDERS],
+                self::METHOD_LIST_ORDER_ITEMS               => [30, 0.5],
+                self::METHOD_LIST_ORDER_ITEMS_BY_NEXT_TOKEN => [30, 0.5],
             ]
         );
     }
